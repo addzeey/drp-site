@@ -13,17 +13,35 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as AdminImport } from './routes/admin'
 
 // Create Virtual Routes
 
 const IndexLazyImport = createFileRoute('/')()
+const ServersIndexLazyImport = createFileRoute('/servers/')()
+const AccountIndexLazyImport = createFileRoute('/account/')()
 
 // Create/Update Routes
+
+const AdminRoute = AdminImport.update({
+  path: '/admin',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const ServersIndexLazyRoute = ServersIndexLazyImport.update({
+  path: '/servers/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/servers/index.lazy').then((d) => d.Route))
+
+const AccountIndexLazyRoute = AccountIndexLazyImport.update({
+  path: '/account/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/account/index.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
@@ -36,12 +54,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminImport
+      parentRoute: typeof rootRoute
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/servers/': {
+      id: '/servers/'
+      path: '/servers'
+      fullPath: '/servers'
+      preLoaderRoute: typeof ServersIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({ IndexLazyRoute })
+export const routeTree = rootRoute.addChildren({
+  IndexLazyRoute,
+  AdminRoute,
+  AccountIndexLazyRoute,
+  ServersIndexLazyRoute,
+})
 
 /* prettier-ignore-end */
 
@@ -51,11 +95,23 @@ export const routeTree = rootRoute.addChildren({ IndexLazyRoute })
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/admin",
+        "/account/",
+        "/servers/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/admin": {
+      "filePath": "admin.tsx"
+    },
+    "/account/": {
+      "filePath": "account/index.lazy.tsx"
+    },
+    "/servers/": {
+      "filePath": "servers/index.lazy.tsx"
     }
   }
 }
