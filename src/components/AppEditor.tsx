@@ -1,20 +1,27 @@
-import React, { useState } from 'react';
-import { Editor } from 'react-simple-wysiwyg';
+interface WysiwygEditorProps {
+    content: string;
+    onContentChange: (content: string) => void;
+}
 
-export const AppEditor = () => {
-    const [editorContent, setEditorContent] = useState("");
+import { useEffect, useState } from 'react';
+import Editor from 'react-simple-wysiwyg';
 
-    const handleChange = (content) => {
-        setEditorContent(content);
-    };
+export const WysiwygEditor = ({ content, onContentChange }: WysiwygEditorProps) => {
+    const [html, setHtml] = useState<string>('');
+
+    useEffect(() => {
+        if (content !== "") {
+            setHtml(content);
+        }
+    }, [content]);
+
+    function onChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+        const newContent = e.target.value;
+        setHtml(newContent);
+        onContentChange(newContent);
+    }
 
     return (
-        <div>
-            <Editor
-                value={editorContent}
-                onChange={handleChange}
-            />
-            <button onClick={() => saveContentToSupabase(editorContent)}>Save</button>
-        </div>
+        <Editor value={html} onChange={onChange} />
     );
-}
+};

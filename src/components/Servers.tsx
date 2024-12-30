@@ -5,13 +5,19 @@ import { ServerCard } from "./ServerCard";
 import { Tables } from 'src/database.types';
 type GameServer = Tables<"game_servers">;
 import "@styles/servers.scss";
+import { Link } from "@tanstack/react-router";
 export const Servers = () => {
     const { data: servers, error, isLoading: loading } = useGetServers();
     const { data: user, error: userError, isLoading: userLoading } = useUserQuery();
     const { data: profile, error: profileError, isLoading: profileLoading } = useFetchProfile();
     return (
-        <section className="p-5 container d-flex flex-column justify-content-center align-items-center">
-            <h1>Servers</h1>
+        <section className="p-2 container d-flex flex-column justify-content-center align-items-center">
+            <h1 className="text-white p-2">Servers</h1>
+            {
+                profile && profile.is_admin ? (
+                    <Link to="/admin/servers" className="btn btn-primary mb-2">Add New Server</Link>
+                ) : null
+            }
             <div className="d-flex justify-content-center gap-3">
             {
                         servers != null ? (

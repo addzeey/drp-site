@@ -1,5 +1,5 @@
 import { createClient, Session } from "@supabase/supabase-js";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
 import { Tables } from "../database.types";
 import { useEffect, useState } from "react";
 type GameServer = Tables<"game_servers">;
@@ -78,6 +78,14 @@ export const fetchProfile = async () => {
 export function isAuthenticated() {
     return fetchUser( ) != null;
 }
+export async function isAdmin(): Promise<boolean> {
+    const data = await fetchUser();
+    if (data) {
+        return data.is_admin;
+    } else {
+        return false;
+    }
+}
 export const signInWithDiscord = async () => {
 	const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'discord',
@@ -112,6 +120,65 @@ export const getServers = async () => {
 	}
 	return data ?? null;
 }
+export const insertHtmlContent = async (name: string, content: string) => {
+	const { data, error } = await supabase
+		.from("html_content")
+		.insert([{ name: name, content: content }]);
+
+	if (error) {
+		console.error("Error inserting HTML content:", error);
+		throw Error("Error inserting HTML content");
+	} else {
+		return data;
+	}
+};
+export const updateHtmlContent = async (id: string, content: string) => {
+		const { data, error } = await supabase
+		.from('html_content')
+		.update({ content: content })
+		.eq("id", id)
+		.select()
+	if (error) {
+		console.error("Error updating HTML content:", error);
+		throw Error("Error updating HTML content");
+	} else {
+		return data;
+	}
+};
+export const useUpdateHtmlContent = () => {
+	return useMutation({
+		mutationFn: ({ id, content }: { id: string; content: string }) =>
+			updateHtmlContent(id, content),
+		onSuccess: (data) => {
+			console.log("HTML content updated successfully");
+		},
+		onError: (error) => {
+			console.error("Failed to update HTML content:", error);
+		},
+	});
+};
+export const useGetHtmlContent = (name: string) => {
+	return useQuery({
+		queryKey: ['html_content', name],
+		queryFn: () => fetchHtmlContent(name),
+		refetchOnWindowFocus: false,
+	});
+}
+export const fetchHtmlContent = async (name: string) => {
+	const { data, error } = await supabase
+		.from("html_content")
+		.select("content")
+		.eq("name", name)
+		.select()
+		.single(); // Fetch a single record
+
+	if (error) {
+		console.error("Error fetching HTML content:", error);
+		return "";
+	}
+
+	return data;
+};
 // export const updateContestStatus = async (contestId: string, status: string) => {
 // 	const { data, error } = await supabase
 // 	.from('art_contest')

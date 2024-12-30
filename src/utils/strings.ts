@@ -9,3 +9,8 @@ export function parseJson<T>(json: unknown): T | null {
     }
     return null;
 }
+
+export const stringToLocalDate = (date: string) => {
+    const d = new Date(date);
+    return d.toLocaleString();
+}

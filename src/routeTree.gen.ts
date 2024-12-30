@@ -13,20 +13,19 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as AdminImport } from './routes/admin'
 
 // Create Virtual Routes
 
 const IndexLazyImport = createFileRoute('/')()
 const ServersIndexLazyImport = createFileRoute('/servers/')()
+const ApplicationIndexLazyImport = createFileRoute('/application/')()
+const AdminIndexLazyImport = createFileRoute('/admin/')()
 const AccountIndexLazyImport = createFileRoute('/account/')()
+const AdminServersLazyImport = createFileRoute('/admin/servers')()
+const AdminRulesLazyImport = createFileRoute('/admin/rules')()
+const AdminApplicationLazyImport = createFileRoute('/admin/application')()
 
 // Create/Update Routes
-
-const AdminRoute = AdminImport.update({
-  path: '/admin',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
@@ -38,10 +37,39 @@ const ServersIndexLazyRoute = ServersIndexLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/servers/index.lazy').then((d) => d.Route))
 
+const ApplicationIndexLazyRoute = ApplicationIndexLazyImport.update({
+  path: '/application/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/application/index.lazy').then((d) => d.Route),
+)
+
+const AdminIndexLazyRoute = AdminIndexLazyImport.update({
+  path: '/admin/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/admin/index.lazy').then((d) => d.Route))
+
 const AccountIndexLazyRoute = AccountIndexLazyImport.update({
   path: '/account/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/account/index.lazy').then((d) => d.Route))
+
+const AdminServersLazyRoute = AdminServersLazyImport.update({
+  path: '/admin/servers',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/admin/servers.lazy').then((d) => d.Route))
+
+const AdminRulesLazyRoute = AdminRulesLazyImport.update({
+  path: '/admin/rules',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/admin/rules.lazy').then((d) => d.Route))
+
+const AdminApplicationLazyRoute = AdminApplicationLazyImport.update({
+  path: '/admin/application',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/admin/application.lazy').then((d) => d.Route),
+)
 
 // Populate the FileRoutesByPath interface
 
@@ -54,11 +82,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminImport
+    '/admin/application': {
+      id: '/admin/application'
+      path: '/admin/application'
+      fullPath: '/admin/application'
+      preLoaderRoute: typeof AdminApplicationLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin/rules': {
+      id: '/admin/rules'
+      path: '/admin/rules'
+      fullPath: '/admin/rules'
+      preLoaderRoute: typeof AdminRulesLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin/servers': {
+      id: '/admin/servers'
+      path: '/admin/servers'
+      fullPath: '/admin/servers'
+      preLoaderRoute: typeof AdminServersLazyImport
       parentRoute: typeof rootRoute
     }
     '/account/': {
@@ -66,6 +108,20 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/application/': {
+      id: '/application/'
+      path: '/application'
+      fullPath: '/application'
+      preLoaderRoute: typeof ApplicationIndexLazyImport
       parentRoute: typeof rootRoute
     }
     '/servers/': {
@@ -82,8 +138,12 @@ declare module '@tanstack/react-router' {
 
 export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
-  AdminRoute,
+  AdminApplicationLazyRoute,
+  AdminRulesLazyRoute,
+  AdminServersLazyRoute,
   AccountIndexLazyRoute,
+  AdminIndexLazyRoute,
+  ApplicationIndexLazyRoute,
   ServersIndexLazyRoute,
 })
 
@@ -96,19 +156,35 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/admin",
+        "/admin/application",
+        "/admin/rules",
+        "/admin/servers",
         "/account/",
+        "/admin/",
+        "/application/",
         "/servers/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
     },
-    "/admin": {
-      "filePath": "admin.tsx"
+    "/admin/application": {
+      "filePath": "admin/application.lazy.tsx"
+    },
+    "/admin/rules": {
+      "filePath": "admin/rules.lazy.tsx"
+    },
+    "/admin/servers": {
+      "filePath": "admin/servers.lazy.tsx"
     },
     "/account/": {
       "filePath": "account/index.lazy.tsx"
+    },
+    "/admin/": {
+      "filePath": "admin/index.lazy.tsx"
+    },
+    "/application/": {
+      "filePath": "application/index.lazy.tsx"
     },
     "/servers/": {
       "filePath": "servers/index.lazy.tsx"
